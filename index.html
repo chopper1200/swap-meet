@@ -9,366 +9,347 @@
 <meta name="theme-color" content="#0a0a0a">
 <title>Vendite Swap Meet</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:#0a0a0a;color:#f0f0f0;font-family:'Courier New',monospace;}
-button,input,select{font-family:'Courier New',monospace;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:#0a0a0a;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,sans-serif;}
+button,input,select{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,sans-serif;}
 input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 ::-webkit-scrollbar{display:none;}
+#app{max-width:480px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;}
+.hdr{background:#0a0a0a;padding:16px 16px 12px;border-bottom:1px solid #151515;position:sticky;top:0;z-index:10;}
+.logo-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.logo-sub{font-size:9px;color:#333;letter-spacing:3px;font-weight:600;margin-bottom:4px;}
+.logo{font-size:18px;font-weight:800;letter-spacing:-0.5px;color:#fff;}
+.logo span{color:#00ff88;}
+.vnav{display:flex;gap:4px;}
+.vnav-btn{border:none;border-radius:8px;padding:7px 11px;font-size:10px;font-weight:700;cursor:pointer;letter-spacing:0.3px;transition:all 0.15s;}
+.vnav-btn.on{background:#00ff88;color:#000;}
+.vnav-btn.off{background:#151515;color:#444;}
+.tabs-wrap{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;}
+.tab-btn{flex-shrink:0;border:none;border-radius:20px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.15s;}
+.new-tab{flex-shrink:0;border:1px dashed #1e1e1e;border-radius:20px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;background:transparent;color:#333;}
+.ct{flex:1;padding:14px 16px;}
+.hero{background:#111;border-radius:20px;padding:20px;margin-bottom:12px;border:1px solid #1a1a1a;}
+.hero-label{font-size:9px;color:#444;letter-spacing:3px;font-weight:700;margin-bottom:6px;}
+.hero-val{font-size:36px;font-weight:900;letter-spacing:-1.5px;line-height:1;}
+.hero-sub{font-size:11px;color:#333;margin-top:6px;}
+.hero-row{display:flex;gap:10px;margin-top:14px;}
+.hero-stat{flex:1;background:#0a0a0a;border-radius:12px;padding:10px;}
+.hero-stat-label{font-size:8px;color:#333;letter-spacing:2px;margin-bottom:4px;}
+.hero-stat-val{font-size:15px;font-weight:800;color:#fff;}
+.card{background:#111;border-radius:20px;overflow:hidden;margin-bottom:10px;border:1px solid #1a1a1a;}
+.card-hdr{padding:16px 18px;display:flex;justify-content:space-between;align-items:center;}
+.card-name{font-size:18px;font-weight:800;letter-spacing:-0.3px;}
+.card-badge{font-size:8px;font-weight:700;letter-spacing:1.5px;margin-top:2px;color:#fff;}
+.card-total{font-size:28px;font-weight:900;letter-spacing:-1px;text-align:right;}
+.card-netto{font-size:10px;color:#333;text-align:right;margin-top:2px;}
+.perc-row{display:flex;align-items:center;gap:10px;padding:10px 18px;border-top:1px solid #161616;border-bottom:1px solid #161616;}
+.toggle{width:38px;height:22px;border-radius:11px;position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0;}
+.toggle-dot{position:absolute;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left 0.15s;}
+.perc-label{font-size:11px;color:#444;}
+.perc-inp{width:50px;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:8px;padding:4px 8px;color:#fff;font-size:13px;font-weight:700;outline:none;text-align:center;}
+.perc-arrow{font-size:11px;font-weight:800;margin-left:auto;}
+.inp-area{padding:14px 18px;display:flex;flex-direction:column;gap:8px;}
+.inp-row{display:flex;gap:8px;}
+.amt-inp{flex:1;min-width:0;background:#0a0a0a;border:none;border-radius:12px;padding:12px 14px;color:#fff;font-size:18px;font-weight:700;outline:none;}
+.add-btn{border:none;border-radius:12px;padding:12px 20px;font-size:20px;font-weight:900;cursor:pointer;flex-shrink:0;color:#000;}
+.note-inp{background:#0a0a0a;border:none;border-radius:12px;padding:10px 14px;color:#444;font-size:12px;outline:none;width:100%;}
+.sale-list{max-height:260px;overflow-y:auto;}
+.sale-item{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-top:1px solid #161616;}
+.sale-amt{font-size:16px;font-weight:800;}
+.sale-date{font-size:10px;color:#333;margin-top:2px;}
+.sale-nota{font-size:10px;color:#2a2a2a;margin-top:1px;}
+.sale-perc{font-size:10px;font-weight:700;margin-top:2px;}
+.del-btn{background:#1a1a1a;color:#333;border:none;border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer;}
+.no-sales{padding:24px;text-align:center;color:#1e1e1e;font-size:11px;font-weight:700;letter-spacing:2px;}
+.rm-btn{width:100%;background:transparent;color:#1e1e1e;border:none;border-top:1px solid #161616;padding:12px;font-size:10px;cursor:pointer;letter-spacing:2px;font-weight:700;}
+.riep-hero{background:#111;border-radius:20px;padding:20px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border:1px solid #1a1a1a;}
+.riep-total{font-size:9px;color:#333;letter-spacing:3px;font-weight:700;margin-bottom:6px;}
+.riep-val{font-size:32px;font-weight:900;color:#00ff88;letter-spacing:-1px;}
+.pdf-btn{background:#00ff88;color:#000;border:none;border-radius:14px;padding:12px 16px;font-size:11px;font-weight:800;cursor:pointer;letter-spacing:0.5px;white-space:nowrap;}
+.riep-card{background:#111;border-radius:16px;padding:14px 18px;margin-bottom:8px;}
+.riep-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.riep-name{font-size:15px;font-weight:800;}
+.riep-count{font-size:10px;color:#333;margin-top:2px;}
+.riep-amt{font-size:18px;font-weight:900;text-align:right;}
+.riep-netto{font-size:10px;color:#333;text-align:right;}
+.riep-badge{font-size:9px;font-weight:700;border-radius:6px;padding:2px 8px;display:inline-block;margin-top:3px;}
+.prog{height:3px;background:#1a1a1a;border-radius:3px;}
+.prog-fill{height:100%;border-radius:3px;}
+.pbox{border-radius:16px;padding:16px 18px;margin-bottom:8px;}
+.pbox-title{font-size:9px;letter-spacing:2px;font-weight:700;margin-bottom:10px;}
+.pbox-row{display:flex;justify-content:space-between;margin-bottom:5px;}
+.pbox-k{font-size:12px;color:#444;}
+.pbox-v{font-size:12px;font-weight:600;}
+.pbox-div{height:1px;background:#1a1a1a;margin:10px 0;}
+.pbox-tot{display:flex;justify-content:space-between;}
+.pbox-tk{font-size:14px;font-weight:800;}
+.pbox-tv{font-size:14px;font-weight:800;}
+.sp-hero{background:#111;border-radius:20px;padding:20px;margin-bottom:10px;border:1px solid #ff6b0022;}
+.sp-label{font-size:9px;color:#ff6b00;letter-spacing:3px;font-weight:700;margin-bottom:6px;}
+.sp-val{font-size:32px;font-weight:900;color:#ff6b00;letter-spacing:-1px;}
+.sp-form{background:#111;border-radius:20px;padding:16px 18px;margin-bottom:10px;border:1px solid #1a1a1a;}
+.sp-form-title{font-size:9px;color:#333;letter-spacing:3px;font-weight:700;margin-bottom:12px;}
+.sp-inp{flex:1;min-width:0;background:#0a0a0a;border:none;border-radius:12px;padding:12px 14px;color:#fff;font-size:18px;font-weight:700;outline:none;}
+.sp-sel{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:12px;padding:10px;color:#fff;font-size:12px;outline:none;flex-shrink:0;}
+.sp-add{width:100%;background:#ff6b00;color:#fff;border:none;border-radius:12px;padding:12px;font-size:13px;font-weight:800;cursor:pointer;letter-spacing:0.5px;margin-top:8px;}
+.sp-item{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-top:1px solid #161616;}
+.sp-cat{font-size:9px;font-weight:700;color:#ff6b00;background:#ff6b0015;border-radius:6px;padding:2px 8px;}
+.sp-amt{font-size:15px;font-weight:800;}
+.sp-date{font-size:10px;color:#333;margin-top:2px;}
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:50;display:flex;align-items:flex-end;justify-content:center;}
+.modal-box{background:#111;border-radius:24px 24px 0 0;padding:28px;width:100%;max-width:480px;border:1px solid #1e1e1e;}
+.modal-title{font-size:16px;font-weight:800;margin-bottom:18px;letter-spacing:-0.3px;}
+.modal-inp{width:100%;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:14px;padding:14px 16px;color:#fff;font-size:16px;font-weight:700;outline:none;margin-bottom:12px;}
+.modal-trow{display:flex;align-items:center;gap:10px;margin-bottom:12px;cursor:pointer;}
+.modal-tlabel{font-size:12px;color:#444;}
+.modal-prow{display:flex;align-items:center;gap:8px;margin-bottom:20px;}
+.modal-plabel{font-size:12px;color:#444;}
+.modal-pinp{width:64px;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:10px;padding:8px 10px;color:#fff;font-size:15px;font-weight:700;outline:none;text-align:center;}
+.modal-btns{display:flex;gap:8px;}
+.modal-cancel{flex:1;background:#1a1a1a;color:#444;border:none;border-radius:14px;padding:14px;font-size:13px;cursor:pointer;}
+.modal-ok{flex:2;background:#00ff88;color:#000;border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;}
+.modal-del{flex:1;background:#ff000020;color:#ff4444;border:none;border-radius:14px;padding:14px;font-size:13px;cursor:pointer;font-weight:700;}
 </style>
 </head>
 <body>
-<div id="root"></div>
+<div id="app"></div>
 <div id="mw"></div>
 <script>
-var PAL=["#e94560","#53d8fb","#f5a623","#a8ff78","#ee4540","#c792ea","#ff9f43","#26de81"];
-var SPESE_CAT=["Carburante","Cibo","Albergo","Pedaggi","Parcheggio","Altro"];
-var KEY="swp7";
-
-function defS(){
-  return{
-    vend:[
-      {n:"Matteo",c:"#e94560",p:false,perc:20},
-      {n:"James", c:"#53d8fb",p:false,perc:20},
-      {n:"Paride",c:"#f5a623",p:false,perc:20},
-      {n:"Simone",c:"#a8ff78",p:false,perc:20},
-      {n:"Nichil",c:"#ee4540",p:false,perc:20}
-    ],
-    sale:{Matteo:[],James:[],Paride:[],Simone:[],Nichil:[]},
-    spese:[],
-    tab:"Matteo",
-    view:"input"
-  };
-}
-
-var S;
-try{var r=localStorage.getItem(KEY);S=r?JSON.parse(r):defS();}catch(e){S=defS();}
-if(!S||!S.vend)S=defS();
-if(!S.spese)S.spese=[];
-S.vend.forEach(function(v){if(v.perc===undefined)v.perc=20;if(v.p===undefined)v.p=false;});
-
+var PAL=["#00ff88","#53d8fb","#f5a623","#a8ff78","#ee4540","#c792ea","#ff9f43","#26de81"];
+var SCAT=["Carburante","Cibo","Albergo","Pedaggi","Parcheggio","Altro"];
+var KEY="swpn1";
+function defS(){return{vend:[{n:"Matteo",c:"#00ff88",p:false,perc:20},{n:"James",c:"#53d8fb",p:false,perc:20},{n:"Paride",c:"#f5a623",p:false,perc:20},{n:"Simone",c:"#a8ff78",p:false,perc:20},{n:"Nichil",c:"#ee4540",p:false,perc:20}],sale:{Matteo:[],James:[],Paride:[],Simone:[],Nichil:[]},spese:[],tab:"Matteo",view:"input"};}
+var S;try{var r=localStorage.getItem(KEY);S=r?JSON.parse(r):defS();}catch(e){S=defS();}
+if(!S||!S.vend)S=defS();if(!S.spese)S.spese=[];
+S.vend.forEach(function(v){if(!v.perc)v.perc=20;if(v.p===undefined)v.p=false;});
 function sv(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
-function money(n){return"\u20AC"+(+n).toFixed(2).replace(".",",");}
-function dateStr(d){try{return new Date(d).toLocaleDateString("it-IT",{day:"2-digit",month:"2-digit",year:"2-digit",hour:"2-digit",minute:"2-digit"});}catch(e){return"";}}
+function m(n){return"\u20AC"+(+n).toFixed(2).replace(".",",");}
+function ds(d){try{return new Date(d).toLocaleDateString("it-IT",{day:"2-digit",month:"2-digit",year:"2-digit",hour:"2-digit",minute:"2-digit"});}catch(e){return"";}}
 function gv(n){for(var i=0;i<S.vend.length;i++)if(S.vend[i].n===n)return S.vend[i];return null;}
-function tot(n){var a=S.sale[n]||[];var s=0;for(var i=0;i<a.length;i++)s+=a[i].importo;return s;}
+function tot(n){var a=S.sale[n]||[],s=0;for(var i=0;i<a.length;i++)s+=a[i].importo;return s;}
 function totG(){var s=0;for(var i=0;i<S.vend.length;i++)s+=tot(S.vend[i].n);return s;}
-function totSpese(){var s=0;for(var i=0;i<S.spese.length;i++)s+=S.spese[i].importo;return s;}
-function pval(v){return tot(v.n)*(v.perc/100);}
-function nval(v){return tot(v.n)-pval(v);}
+function totSp(){var s=0;for(var i=0;i<S.spese.length;i++)s+=S.spese[i].importo;return s;}
+function pv(v){return tot(v.n)*(v.perc/100);}
+function nv(v){return tot(v.n)-pv(v);}
+function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e;}
 function mk(tag,css,txt){var e=document.createElement(tag);if(css)e.style.cssText=css;if(txt!==undefined)e.textContent=txt;return e;}
-function btn(txt,css,fn){var b=mk("button",css+"cursor:pointer;");b.textContent=txt;b.onclick=fn;return b;}
+function b(txt,cls,fn){var e=el("button",cls,txt);e.onclick=fn;return e;}
 
 function render(){
-  var root=document.getElementById("root");root.innerHTML="";
-  root.style.cssText="max-width:480px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;";
-  var v=gv(S.tab)||S.vend[0];var col=v?v.c:"#888";
-
-  var hdr=mk("div","background:#111;border-bottom:1px solid #1a1a1a;padding:12px 14px 10px;position:sticky;top:0;z-index:10;");
-  var tr=mk("div","display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;");
-  var tb=mk("div");
-  tb.appendChild(mk("div","font-size:9px;color:#444;letter-spacing:3px;","REGISTRO"));
-  tb.appendChild(mk("div","font-size:17px;font-weight:700;","\uD83C\uDFCD Vendite Swap Meet"));
-  tr.appendChild(tb);
-  var vb=mk("div","display:flex;gap:5px;");
-  ["input","riepilogo","spese"].forEach(function(vw){
-    var label=vw==="input"?"Input":vw==="riepilogo"?"Riepilogo":"Spese";
-    vb.appendChild(btn(label,"border:none;border-radius:8px;padding:6px 10px;font-size:10px;font-weight:700;background:"+(S.view===vw?"#f0f0f0":"#1a1a1a")+";color:"+(S.view===vw?"#000":"#555")+";",function(){S.view=vw;sv();render();}));
+  var root=document.getElementById("app");root.innerHTML="";
+  var vv=gv(S.tab)||S.vend[0];var col=vv?vv.c:"#00ff88";
+  var hdr=el("div","hdr");
+  var lr=el("div","logo-row");
+  var lbox=el("div");lbox.appendChild(el("div","logo-sub","REGISTRO"));
+  var logo=el("div","logo");logo.innerHTML="\uD83C\uDFCD Swap <span>Meet</span>";lbox.appendChild(logo);
+  lr.appendChild(lbox);
+  var vb=el("div","vnav");
+  [{k:"input",l:"Input"},{k:"riepilogo",l:"Riep."},{k:"spese",l:"Spese"}].forEach(function(x){
+    vb.appendChild(b(x.l,"vnav-btn "+(S.view===x.k?"on":"off"),function(k){return function(){S.view=k;sv();render();};}(x.k)));
   });
-  tr.appendChild(vb);hdr.appendChild(tr);
-
-  var tabs=mk("div","display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;");
-  for(var i=0;i<S.vend.length;i++){
-    (function(vv){
-      var active=S.tab===vv.n&&S.view==="input";
-      var b=btn(
-        vv.n+(vv.p?" "+vv.perc+"%":""),
-        "flex-shrink:0;border:none;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:700;background:"+(active?vv.c:"#1a1a1a")+";color:"+(active?"#000":"#666")+";",
-        function(){S.tab=vv.n;S.view="input";sv();render();}
-      );
-      var lt;
-      b.addEventListener("touchstart",function(){lt=setTimeout(function(){openEditVend(vv.n);},600);},{passive:true});
-      b.addEventListener("touchend",function(){clearTimeout(lt);},{passive:true});
-      b.addEventListener("contextmenu",function(e){e.preventDefault();openEditVend(vv.n);});
-      tabs.appendChild(b);
-    })(S.vend[i]);
-  }
-  tabs.appendChild(btn("+ nuovo","flex-shrink:0;background:#1a1a1a;color:#444;border:1px dashed #333;border-radius:20px;padding:8px 16px;font-size:13px;",openNewVend));
+  lr.appendChild(vb);hdr.appendChild(lr);
+  var tabs=el("div","tabs-wrap");
+  S.vend.forEach(function(vx){
+    var active=S.tab===vx.n&&S.view==="input";
+    var tb=b(vx.n+(vx.p?" "+vx.perc+"%":""),"tab-btn",function(n){return function(){S.tab=n;S.view="input";sv();render();};}(vx.n));
+    tb.style.background=active?vx.c:"#151515";tb.style.color=active?"#000":"#444";
+    var lt;
+    tb.addEventListener("touchstart",function(n){return function(){lt=setTimeout(function(){openEdit(n);},600);};}(vx.n),{passive:true});
+    tb.addEventListener("touchend",function(){clearTimeout(lt);},{passive:true});
+    tb.addEventListener("contextmenu",function(n){return function(e){e.preventDefault();openEdit(n);};}(vx.n));
+    tabs.appendChild(tb);
+  });
+  var nb=b("+ nuovo","new-tab",openNew);tabs.appendChild(nb);
   hdr.appendChild(tabs);root.appendChild(hdr);
-
-  var ct=mk("div","flex:1;padding:12px 14px;");
-  if(S.view==="input")renderInput(ct,v,col);
+  var ct=el("div","ct");
+  if(S.view==="input")renderInput(ct,vv,col);
   else if(S.view==="riepilogo")renderRiep(ct);
   else renderSpese(ct);
   root.appendChild(ct);
 }
 
-function renderInput(wrap,v,col){
-  var nome=v.n,ps=v.p,perc=v.perc,sales=S.sale[nome]||[],t=tot(nome);
-  var card=mk("div","background:#111;border-radius:16px;overflow:hidden;border:1px solid "+col+"33;margin-bottom:12px;");
-
-  var ch=mk("div","background:"+col+"18;border-bottom:1px solid "+col+"33;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;");
-  var cl=mk("div");
-  cl.appendChild(mk("div","font-size:17px;font-weight:700;",nome));
-  if(ps)cl.appendChild(mk("div","font-size:9px;color:"+col+";letter-spacing:1.5px;margin-top:2px;","PERC. "+perc+"% ATTIVA"));
-  var cr=mk("div","display:flex;flex-direction:column;align-items:flex-end;");
-  cr.appendChild(mk("div","font-size:22px;font-weight:700;color:"+col+";",money(t)));
-  if(ps&&t>0)cr.appendChild(mk("div","font-size:10px;color:#555;","netto "+money(nval(v))));
+function renderInput(ct,vv,col){
+  var nome=vv.n,ps=vv.p,perc=vv.perc,sales=S.sale[nome]||[],t=tot(nome);
+  var hero=el("div","hero");
+  hero.appendChild(el("div","hero-label","TOTALE VENDITE"));
+  var hv=el("div","hero-val",m(t));hv.style.color=col;hero.appendChild(hv);
+  if(ps&&t>0)hero.appendChild(el("div","hero-sub","netto "+m(nv(vv))+" · perc. "+m(pv(vv))));
+  var hr=el("div","hero-row");
+  var hs1=el("div","hero-stat");hs1.appendChild(el("div","hero-stat-label","VENDITE"));hs1.appendChild(el("div","hero-stat-val",String(sales.length)));
+  var hs2=el("div","hero-stat");hs2.appendChild(el("div","hero-stat-label","MEDIA"));hs2.appendChild(el("div","hero-stat-val",sales.length?m(t/sales.length):"—"));
+  hr.appendChild(hs1);hr.appendChild(hs2);hero.appendChild(hr);ct.appendChild(hero);
+  var card=el("div","card");card.style.borderColor=col+"22";
+  var ch=el("div","card-hdr");ch.style.background=col+"0a";
+  var cl=el("div");var cn=el("div","card-name",nome);cn.style.color=col;cl.appendChild(cn);
+  if(ps)cl.appendChild(el("div","card-badge","PERC. "+perc+"% ATTIVA"));
+  var cr=el("div");var ctv=el("div","card-total",m(t));ctv.style.color=col;cr.appendChild(ctv);
+  if(ps&&t>0)cr.appendChild(el("div","card-netto","netto "+m(nv(vv))));
   ch.appendChild(cl);ch.appendChild(cr);card.appendChild(ch);
-
-  var prow=mk("div","display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #161616;");
-  var tbg=mk("div","width:36px;height:20px;border-radius:10px;background:"+(ps?"#f5a623":"#2a2a2a")+";position:relative;flex-shrink:0;cursor:pointer;transition:background 0.2s;");
-  var tdt=mk("div","position:absolute;top:2px;left:"+(ps?"18px":"2px")+";width:16px;height:16px;border-radius:50%;background:#fff;transition:left 0.15s;");
-  tbg.appendChild(tdt);
-  tbg.onclick=function(){v.p=!v.p;sv();render();};
-  prow.appendChild(tbg);
-  prow.appendChild(mk("span","font-size:11px;color:#666;","Percentuale:"));
-  var pinp=document.createElement("input");
-  pinp.type="number";pinp.value=perc;pinp.min=0;pinp.max=100;
-  pinp.style.cssText="width:52px;background:#0a0a0a;border:1px solid #333;border-radius:6px;padding:3px 6px;color:#f0f0f0;font-family:'Courier New',monospace;font-size:12px;outline:none;text-align:center;";
-  pinp.onchange=function(){var val=parseFloat(pinp.value);if(!isNaN(val)&&val>=0&&val<=100){v.perc=val;sv();render();}};
-  prow.appendChild(pinp);
-  prow.appendChild(mk("span","font-size:11px;color:#666;","%"));
-  if(ps&&t>0)prow.appendChild(mk("span","font-size:11px;font-weight:700;color:"+col+";margin-left:auto;","\u2192 "+money(pval(v))));
+  var prow=el("div","perc-row");
+  var tbg=el("div","toggle");tbg.style.background=ps?col:"#1a1a1a";
+  var tdt=el("div","toggle-dot");tdt.style.left=ps?"19px":"3px";tbg.appendChild(tdt);
+  tbg.onclick=function(){vv.p=!vv.p;sv();render();};
+  prow.appendChild(tbg);prow.appendChild(el("div","perc-label","Percentuale:"));
+  var pi=document.createElement("input");pi.type="number";pi.value=perc;pi.min=0;pi.max=100;pi.className="perc-inp";
+  pi.onchange=function(){var v=parseFloat(pi.value);if(!isNaN(v)&&v>=0&&v<=100){vv.perc=v;sv();render();}};
+  prow.appendChild(pi);prow.appendChild(el("div","perc-label","%"));
+  if(ps&&t>0){var pa=el("div","perc-arrow","\u2192 "+m(pv(vv)));pa.style.color=col;prow.appendChild(pa);}
   card.appendChild(prow);
-
-  var ia=mk("div","padding:12px 14px;display:flex;flex-direction:column;gap:8px;");
-  var ir=mk("div","display:flex;gap:8px;");
-  var ainp=document.createElement("input");
-  ainp.type="number";ainp.inputMode="decimal";ainp.placeholder="\u20AC importo";
-  ainp.style.cssText="flex:1;min-width:0;background:#0a0a0a;border:1px solid "+col+"55;border-radius:10px;padding:10px 12px;color:#f0f0f0;font-family:'Courier New',monospace;font-size:16px;outline:none;";
-  var ninp=document.createElement("input");
-  ninp.type="text";ninp.placeholder="nota (opzionale)";
-  ninp.style.cssText="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:10px;padding:8px 12px;color:#888;font-family:'Courier New',monospace;font-size:12px;outline:none;width:100%;";
-  var ab=btn("+","background:"+col+";color:#000;border:none;border-radius:10px;padding:10px 20px;font-size:18px;font-weight:700;flex-shrink:0;",function(){
-    var val=parseFloat((ainp.value||"").replace(",","."));if(isNaN(val)||val<=0)return;
+  var ia=el("div","inp-area");var ir=el("div","inp-row");
+  var ai=document.createElement("input");ai.type="number";ai.inputMode="decimal";ai.placeholder="\u20AC importo";ai.className="amt-inp";ai.style.border="1px solid "+col+"33";
+  var ni=document.createElement("input");ni.type="text";ni.placeholder="aggiungi una nota...";ni.className="note-inp";
+  var ab=b("+","add-btn",function(){
+    var val=parseFloat((ai.value||"").replace(",","."));if(isNaN(val)||val<=0)return;
     if(!S.sale[nome])S.sale[nome]=[];
-    S.sale[nome].push({importo:val,nota:ninp.value||"",id:Date.now(),data:new Date().toISOString()});
-    ainp.value="";ninp.value="";sv();render();
+    S.sale[nome].push({importo:val,nota:ni.value||"",id:Date.now(),data:new Date().toISOString()});
+    ai.value="";ni.value="";sv();render();
   });
-  ainp.onkeydown=function(e){if(e.key==="Enter")ab.onclick();};
-  ir.appendChild(ainp);ir.appendChild(ab);ia.appendChild(ir);ia.appendChild(ninp);card.appendChild(ia);
-
-  var sl=mk("div","max-height:260px;overflow-y:auto;");
-  if(!sales.length){
-    sl.appendChild(mk("div","padding:20px;text-align:center;color:#222;font-size:12px;","nessuna vendita"));
-  } else {
-    var rev=sales.slice().reverse();
-    for(var i=0;i<rev.length;i++){
-      (function(s){
-        var si=mk("div","display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-top:1px solid #161616;");
-        var info=mk("div");
-        info.appendChild(mk("div","font-size:15px;font-weight:600;",money(s.importo)));
-        info.appendChild(mk("div","font-size:10px;color:#333;margin-top:1px;",dateStr(s.data)));
-        if(s.nota)info.appendChild(mk("div","font-size:10px;color:#444;margin-top:1px;",s.nota));
-        if(ps)info.appendChild(mk("div","font-size:10px;color:"+col+";margin-top:1px;","perc. "+money(s.importo*(perc/100))));
-        var rb=btn("\u2715","background:#1a1a1a;color:#444;border:none;border-radius:6px;padding:5px 11px;font-size:13px;",function(){
-          S.sale[nome]=S.sale[nome].filter(function(x){return x.id!==s.id;});sv();render();
-        });
-        si.appendChild(info);si.appendChild(rb);sl.appendChild(si);
-      })(rev[i]);
-    }
-  }
+  ab.style.background=col;ai.onkeydown=function(e){if(e.key==="Enter")ab.onclick();};
+  ir.appendChild(ai);ir.appendChild(ab);ia.appendChild(ir);ia.appendChild(ni);card.appendChild(ia);
+  var sl=el("div","sale-list");
+  if(!sales.length){sl.appendChild(el("div","no-sales","NESSUNA VENDITA"));}
+  else{sales.slice().reverse().forEach(function(s){
+    var si=el("div","sale-item");var info=el("div");
+    var sa=el("div","sale-amt",m(s.importo));sa.style.color=col;info.appendChild(sa);
+    info.appendChild(el("div","sale-date",ds(s.data)));
+    if(s.nota)info.appendChild(el("div","sale-nota",s.nota));
+    if(ps)info.appendChild(el("div","sale-perc","perc. "+m(s.importo*(perc/100))));
+    var db=b("\u2715","del-btn",function(id){return function(){S.sale[nome]=S.sale[nome].filter(function(x){return x.id!==id;});sv();render();};}(s.id));
+    si.appendChild(info);si.appendChild(db);sl.appendChild(si);
+  });}
   card.appendChild(sl);
-  if(S.vend.length>1){
-    card.appendChild(btn("rimuovi "+nome+" dal registro","width:100%;background:transparent;color:#2a2a2a;border:none;border-top:1px solid #161616;padding:10px;font-size:11px;",function(){
-      if(!confirm("Rimuovere "+nome+"?"))return;
-      S.vend=S.vend.filter(function(x){return x.n!==nome;});delete S.sale[nome];S.tab=S.vend[0]?S.vend[0].n:"";sv();render();
-    }));
-  }
-  wrap.appendChild(card);
+  if(S.vend.length>1){card.appendChild(b("RIMUOVI "+nome.toUpperCase()+" DAL REGISTRO","rm-btn",function(){
+    if(!confirm("Rimuovere "+nome+"?"))return;
+    S.vend=S.vend.filter(function(x){return x.n!==nome;});delete S.sale[nome];S.tab=S.vend[0]?S.vend[0].n:"";sv();render();
+  }));}
+  ct.appendChild(card);
 }
 
-function renderRiep(wrap){
-  var tg=totG();var ts=totSpese();
-  var stot=mk("div","background:#111;border-radius:16px;padding:14px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border:1px solid #1a1a1a;");
-  var tb=mk("div");
-  tb.appendChild(mk("div","font-size:9px;color:#444;letter-spacing:2px;","TOTALE GENERALE"));
-  tb.appendChild(mk("div","font-size:26px;font-weight:700;",money(tg)));
-  if(ts>0)tb.appendChild(mk("div","font-size:11px;color:#555;margin-top:2px;","netto spese: "+money(tg-ts)));
-  stot.appendChild(tb);
-  stot.appendChild(btn("\uD83D\uDCC4 PDF","background:#f0f0f0;color:#000;border:none;border-radius:10px;padding:9px 14px;font-size:11px;font-weight:700;",esporta));
-  wrap.appendChild(stot);
-
-  for(var i=0;i<S.vend.length;i++){
-    var vv=S.vend[i],t=tot(vv.n),n=(S.sale[vv.n]||[]).length;
-    var sc=mk("div","background:#111;border-radius:14px;padding:12px 14px;margin-bottom:8px;border:1px solid "+vv.c+"33;");
-    var sct=mk("div","display:flex;justify-content:space-between;align-items:flex-start;");
-    var sl=mk("div");sl.appendChild(mk("div","font-weight:700;font-size:14px;",vv.n));sl.appendChild(mk("div","font-size:10px;color:#444;margin-top:2px;",n+" vendita"+(n!==1?"e":"")));
-    var sr=mk("div","display:flex;flex-direction:column;align-items:flex-end;");
-    sr.appendChild(mk("div","font-size:17px;font-weight:700;color:"+vv.c+";",money(t)));
-    if(vv.p&&t>0){
-      sr.appendChild(mk("div","font-size:10px;color:#555;","netto "+money(nval(vv))));
-      sr.appendChild(mk("div","font-size:10px;font-weight:700;border-radius:4px;padding:1px 6px;color:"+vv.c+";background:"+vv.c+"20;margin-top:2px;",vv.perc+"% = "+money(pval(vv))));
-    }
-    sct.appendChild(sl);sct.appendChild(sr);sc.appendChild(sct);
-    var bw=mk("div","margin-top:10px;height:2px;background:#1a1a1a;border-radius:2px;");
-    var bf=mk("div","height:100%;border-radius:2px;background:"+vv.c+";width:"+(tg>0?(t/tg*100):0)+"%;");
-    bw.appendChild(bf);sc.appendChild(bw);wrap.appendChild(sc);
-  }
-
-  for(var i=0;i<S.vend.length;i++){
-    var vv=S.vend[i];if(!vv.p||tot(vv.n)<=0)continue;
-    var pb=mk("div","background:"+vv.c+"12;border:1px solid "+vv.c+"55;border-radius:14px;padding:14px 16px;margin-bottom:8px;");
-    pb.appendChild(mk("div","font-size:9px;letter-spacing:2px;color:"+vv.c+";margin-bottom:8px;","PERCENTUALE "+vv.n.toUpperCase()+" ("+vv.perc+"%)"));
-    [[" Vendite lorde",money(tot(vv.n))],["Percentuale ("+vv.perc+"%)","- "+money(pval(vv))]].forEach(function(row){
-      var r=mk("div","display:flex;justify-content:space-between;margin-bottom:4px;");
-      r.appendChild(mk("span","font-size:12px;color:#666;",row[0]));r.appendChild(mk("span","font-size:12px;",row[1]));pb.appendChild(r);
+function renderRiep(ct){
+  var tg=totG(),ts=totSp();
+  var rh=el("div","riep-hero");
+  var rb=el("div");rb.appendChild(el("div","riep-total","TOTALE GENERALE"));rb.appendChild(el("div","riep-val",m(tg)));
+  if(ts>0)rb.appendChild(mk("div","font-size:11px;color:#333;margin-top:4px;","netto spese: "+m(tg-ts)));
+  rh.appendChild(rb);rh.appendChild(b("\uD83D\uDCC4 PDF","pdf-btn",esporta));ct.appendChild(rh);
+  S.vend.forEach(function(vx){
+    var t=tot(vx.n),n=(S.sale[vx.n]||[]).length;
+    var rc=el("div","riep-card");rc.style.border="1px solid "+vx.c+"22";
+    var row=el("div","riep-row");
+    var rl=el("div");var rn=el("div","riep-name",vx.n);rn.style.color=vx.c;rl.appendChild(rn);rl.appendChild(el("div","riep-count",n+" vendita"+(n!==1?"e":"")));
+    var rr=el("div");var ra=el("div","riep-amt",m(t));ra.style.color=vx.c;rr.appendChild(ra);
+    if(vx.p&&t>0){rr.appendChild(el("div","riep-netto","netto "+m(nv(vx))));var bdg=el("div","riep-badge",vx.perc+"% = "+m(pv(vx)));bdg.style.color=vx.c;bdg.style.background=vx.c+"20";rr.appendChild(bdg);}
+    row.appendChild(rl);row.appendChild(rr);rc.appendChild(row);
+    var pg=el("div","prog");var pf=el("div","prog-fill");pf.style.background=vx.c;pf.style.width=(tg>0?(t/tg*100):0)+"%";pg.appendChild(pf);rc.appendChild(pg);
+    ct.appendChild(rc);
+  });
+  S.vend.forEach(function(vx){
+    if(!vx.p||tot(vx.n)<=0)return;
+    var pb=el("div","pbox");pb.style.background=vx.c+"10";pb.style.border="1px solid "+vx.c+"33";
+    var pt=el("div","pbox-title","PERCENTUALE "+vx.n.toUpperCase()+" ("+vx.perc+"%)");pt.style.color=vx.c;pb.appendChild(pt);
+    [["Vendite lorde",m(tot(vx.n))],["Percentuale ("+vx.perc+"%)","- "+m(pv(vx))]].forEach(function(row){
+      var r=el("div","pbox-row");r.appendChild(el("div","pbox-k",row[0]));r.appendChild(el("div","pbox-v",row[1]));pb.appendChild(r);
     });
-    pb.appendChild(mk("div","height:1px;background:#222;margin:8px 0;"));
-    var ptr=mk("div","display:flex;justify-content:space-between;");
-    ptr.appendChild(mk("span","font-size:13px;font-weight:700;","Netto "+vv.n));ptr.appendChild(mk("span","font-size:13px;font-weight:700;",money(nval(vv))));pb.appendChild(ptr);
-    wrap.appendChild(pb);
-  }
-
+    pb.appendChild(el("div","pbox-div"));
+    var tr=el("div","pbox-tot");var tk=el("div","pbox-tk","Netto "+vx.n);var tv=el("div","pbox-tv",m(nv(vx)));tv.style.color=vx.c;tr.appendChild(tk);tr.appendChild(tv);pb.appendChild(tr);
+    ct.appendChild(pb);
+  });
   if(ts>0){
-    var sb=mk("div","background:#ff9f4318;border:1px solid #ff9f4355;border-radius:14px;padding:14px 16px;margin-bottom:8px;");
-    sb.appendChild(mk("div","font-size:9px;letter-spacing:2px;color:#ff9f43;margin-bottom:8px;","TOTALE SPESE"));
+    var sb=el("div","pbox");sb.style.background="#ff6b0010";sb.style.border="1px solid #ff6b0033";
+    var st=el("div","pbox-title","TOTALE SPESE");st.style.color="#ff6b00";sb.appendChild(st);
     var cats={};S.spese.forEach(function(s){cats[s.cat]=(cats[s.cat]||0)+s.importo;});
-    Object.keys(cats).forEach(function(cat){
-      var r=mk("div","display:flex;justify-content:space-between;margin-bottom:4px;");
-      r.appendChild(mk("span","font-size:12px;color:#666;",cat));r.appendChild(mk("span","font-size:12px;",money(cats[cat])));sb.appendChild(r);
-    });
-    sb.appendChild(mk("div","height:1px;background:#222;margin:8px 0;"));
-    var pr=mk("div","display:flex;justify-content:space-between;");
-    pr.appendChild(mk("span","font-size:13px;font-weight:700;","Totale spese"));pr.appendChild(mk("span","font-size:13px;font-weight:700;color:#ff9f43;",money(ts)));sb.appendChild(pr);
-    wrap.appendChild(sb);
+    Object.keys(cats).forEach(function(cat){var r=el("div","pbox-row");r.appendChild(el("div","pbox-k",cat));r.appendChild(el("div","pbox-v",m(cats[cat])));sb.appendChild(r);});
+    sb.appendChild(el("div","pbox-div"));
+    var tr2=el("div","pbox-tot");var tk2=el("div","pbox-tk","Totale");var tv2=el("div","pbox-tv",m(ts));tv2.style.color="#ff6b00";tr2.appendChild(tk2);tr2.appendChild(tv2);sb.appendChild(tr2);
+    ct.appendChild(sb);
   }
 }
 
-function renderSpese(wrap){
-  var ts=totSpese();
-  var head=mk("div","background:#111;border-radius:16px;padding:14px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border:1px solid #ff9f4333;");
-  var tb=mk("div");tb.appendChild(mk("div","font-size:9px;color:#ff9f43;letter-spacing:2px;","TOTALE SPESE"));tb.appendChild(mk("div","font-size:26px;font-weight:700;",money(ts)));
-  head.appendChild(tb);wrap.appendChild(head);
-
-  var form=mk("div","background:#111;border-radius:16px;padding:14px;margin-bottom:10px;border:1px solid #1a1a1a;");
-  form.appendChild(mk("div","font-size:10px;color:#555;margin-bottom:10px;letter-spacing:1px;","NUOVA SPESA"));
-  var row1=mk("div","display:flex;gap:8px;margin-bottom:8px;");
-  var si=document.createElement("input");si.type="number";si.inputMode="decimal";si.placeholder="\u20AC importo";
-  si.style.cssText="flex:1;min-width:0;background:#0a0a0a;border:1px solid #ff9f4355;border-radius:10px;padding:10px 12px;color:#f0f0f0;font-family:'Courier New',monospace;font-size:16px;outline:none;";
-  var sel=document.createElement("select");
-  sel.style.cssText="background:#0a0a0a;border:1px solid #333;border-radius:10px;padding:10px 8px;color:#f0f0f0;font-family:'Courier New',monospace;font-size:12px;outline:none;flex-shrink:0;";
-  SPESE_CAT.forEach(function(c){var o=document.createElement("option");o.value=c;o.textContent=c;sel.appendChild(o);});
-  row1.appendChild(si);row1.appendChild(sel);form.appendChild(row1);
-  var sn=document.createElement("input");sn.type="text";sn.placeholder="nota (opzionale)";
-  sn.style.cssText="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:10px;padding:8px 12px;color:#888;font-family:'Courier New',monospace;font-size:12px;outline:none;width:100%;margin-bottom:8px;";
-  form.appendChild(sn);
-  var sab=btn("+ Aggiungi spesa","width:100%;background:#ff9f43;color:#000;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:700;",function(){
+function renderSpese(ct){
+  var ts=totSp();
+  var sh=el("div","sp-hero");sh.appendChild(el("div","sp-label","TOTALE SPESE"));sh.appendChild(el("div","sp-val",m(ts)));ct.appendChild(sh);
+  var sf=el("div","sp-form");sf.appendChild(el("div","sp-form-title","NUOVA SPESA"));
+  var r1=mk("div","display:flex;gap:8px;margin-bottom:8px;");
+  var si=document.createElement("input");si.type="number";si.inputMode="decimal";si.placeholder="\u20AC importo";si.className="sp-inp";
+  var sel=document.createElement("select");sel.className="sp-sel";
+  SCAT.forEach(function(c){var o=document.createElement("option");o.value=c;o.textContent=c;sel.appendChild(o);});
+  r1.appendChild(si);r1.appendChild(sel);sf.appendChild(r1);
+  var sn=document.createElement("input");sn.type="text";sn.placeholder="nota...";sn.className="note-inp";sn.style.marginBottom="8px";sf.appendChild(sn);
+  var sab=b("+ AGGIUNGI SPESA","sp-add",function(){
     var val=parseFloat((si.value||"").replace(",","."));if(isNaN(val)||val<=0)return;
     S.spese.push({importo:val,cat:sel.value,nota:sn.value||"",id:Date.now(),data:new Date().toISOString()});
     si.value="";sn.value="";sv();render();
   });
-  si.onkeydown=function(e){if(e.key==="Enter")sab.onclick();};
-  form.appendChild(sab);wrap.appendChild(form);
-
-  if(!S.spese.length){
-    wrap.appendChild(mk("div","background:#111;border-radius:14px;padding:20px;text-align:center;color:#222;font-size:12px;border:1px solid #1a1a1a;","nessuna spesa registrata"));
-    return;
-  }
-  var list=mk("div","background:#111;border-radius:14px;overflow:hidden;border:1px solid #1a1a1a;");
-  var rev=S.spese.slice().reverse();
-  for(var i=0;i<rev.length;i++){
-    (function(s,idx){
-      var si2=mk("div","display:flex;justify-content:space-between;align-items:center;padding:10px 14px;"+(idx>0?"border-top:1px solid #161616;":""));
-      var info=mk("div");
-      var firstRow=mk("div","display:flex;align-items:center;gap:6px;");
-      firstRow.appendChild(mk("span","font-size:10px;font-weight:700;color:#ff9f43;background:#ff9f4320;border-radius:4px;padding:1px 6px;",s.cat));
-      firstRow.appendChild(mk("span","font-size:15px;font-weight:600;",money(s.importo)));
-      info.appendChild(firstRow);
-      info.appendChild(mk("div","font-size:10px;color:#333;margin-top:1px;",dateStr(s.data)));
-      if(s.nota)info.appendChild(mk("div","font-size:10px;color:#444;margin-top:1px;",s.nota));
-      var rb=btn("\u2715","background:#1a1a1a;color:#444;border:none;border-radius:6px;padding:5px 11px;font-size:13px;",function(){
-        S.spese=S.spese.filter(function(x){return x.id!==s.id;});sv();render();
-      });
-      si2.appendChild(info);si2.appendChild(rb);list.appendChild(si2);
-    })(rev[i],i);
-  }
-  wrap.appendChild(list);
+  si.onkeydown=function(e){if(e.key==="Enter")sab.onclick();};sf.appendChild(sab);ct.appendChild(sf);
+  if(!S.spese.length){ct.appendChild(mk("div","background:#111;border-radius:20px;padding:24px;text-align:center;color:#1e1e1e;font-size:11px;font-weight:700;letter-spacing:2px;border:1px solid #151515;","NESSUNA SPESA"));return;}
+  var list=el("div","card");
+  S.spese.slice().reverse().forEach(function(s){
+    var si2=el("div","sp-item");var info=el("div");
+    var fr=mk("div","display:flex;align-items:center;gap:8px;margin-bottom:3px;");
+    fr.appendChild(el("span","sp-cat",s.cat));fr.appendChild(el("span","sp-amt",m(s.importo)));
+    info.appendChild(fr);info.appendChild(el("div","sp-date",ds(s.data)));
+    if(s.nota)info.appendChild(el("div","sale-nota",s.nota));
+    var db=b("\u2715","del-btn",function(id){return function(){S.spese=S.spese.filter(function(x){return x.id!==id;});sv();render();};}(s.id));
+    si2.appendChild(info);si2.appendChild(db);list.appendChild(si2);
+  });
+  ct.appendChild(list);
 }
 
-function openNewVend(){
+function openNew(){
   var mw=document.getElementById("mw");mw.innerHTML="";
-  var nuovoPerc=false;var nuovoPct=20;
-  var ov=mk("div","position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:50;display:flex;align-items:flex-end;justify-content:center;");
-  var mb=mk("div","background:#151515;border-radius:20px 20px 0 0;padding:24px;width:100%;max-width:480px;border:1px solid #2a2a2a;");
-  mb.appendChild(mk("div","font-size:14px;font-weight:700;margin-bottom:14px;","Nuovo venditore"));
-  var mi=document.createElement("input");mi.type="text";mi.placeholder="Nome";
-  mi.style.cssText="width:100%;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:10px;padding:10px 14px;color:#f0f0f0;font-family:'Courier New',monospace;font-size:15px;outline:none;margin-bottom:12px;";
-  mb.appendChild(mi);
-  var trow=mk("div","display:flex;align-items:center;gap:10px;margin-bottom:12px;cursor:pointer;");
-  var tbg=mk("div","width:36px;height:20px;border-radius:10px;background:#2a2a2a;position:relative;flex-shrink:0;");
-  var tdt=mk("div","position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left 0.15s;");
-  tbg.appendChild(tdt);trow.appendChild(tbg);trow.appendChild(mk("span","font-size:12px;color:#777;","Percentuale attiva"));
-  trow.onclick=function(){nuovoPerc=!nuovoPerc;tbg.style.background=nuovoPerc?"#f5a623":"#2a2a2a";tdt.style.left=nuovoPerc?"18px":"2px";};
-  mb.appendChild(trow);
-  var pr=mk("div","display:flex;align-items:center;gap:8px;margin-bottom:16px;");
-  pr.appendChild(mk("span","font-size:12px;color:#777;","Percentuale:"));
-  var pi=document.createElement("input");pi.type="number";pi.value=20;pi.min=0;pi.max=100;
-  pi.style.cssText="width:60px;background:#0d0d0d;border:1px solid #333;border-radius:8px;padding:6px 10px;color:#f0f0f0;font-family:'Courier New',monospace;font-size:14px;outline:none;text-align:center;";
-  pi.onchange=function(){nuovoPct=parseFloat(pi.value)||20;};
-  pr.appendChild(pi);pr.appendChild(mk("span","font-size:12px;color:#777;","%"));mb.appendChild(pr);
-  var mbs=mk("div","display:flex;gap:8px;");
-  mbs.appendChild(btn("Annulla","flex:1;background:#1e1e1e;color:#777;border:none;border-radius:10px;padding:11px;font-size:13px;",function(){mw.innerHTML="";}));
-  var mok=btn("Aggiungi","flex:2;background:#f0f0f0;color:#000;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:700;",function(){
+  var np=false,npc=20;
+  var ov=mk("div","position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:50;display:flex;align-items:flex-end;justify-content:center;");
+  var mb=el("div","modal-box");mb.appendChild(el("div","modal-title","Nuovo venditore"));
+  var mi=document.createElement("input");mi.type="text";mi.placeholder="Nome...";mi.className="modal-inp";mb.appendChild(mi);
+  var tr=el("div","modal-trow");var tbg=el("div","toggle");tbg.style.background="#1a1a1a";var tdt=el("div","toggle-dot");tdt.style.left="3px";tbg.appendChild(tdt);tr.appendChild(tbg);tr.appendChild(el("div","modal-tlabel","Percentuale attiva"));
+  tr.onclick=function(){np=!np;tbg.style.background=np?"#00ff88":"#1a1a1a";tdt.style.left=np?"19px":"3px";};mb.appendChild(tr);
+  var pr=el("div","modal-prow");pr.appendChild(el("div","modal-plabel","Percentuale:"));
+  var pi=document.createElement("input");pi.type="number";pi.value=20;pi.className="modal-pinp";pi.onchange=function(){npc=parseFloat(pi.value)||20;};
+  pr.appendChild(pi);pr.appendChild(el("div","modal-plabel","%"));mb.appendChild(pr);
+  var btns=el("div","modal-btns");btns.appendChild(b("Annulla","modal-cancel",function(){mw.innerHTML="";}));
+  var ok=b("Aggiungi","modal-ok",function(){
     var nome=mi.value.trim();if(!nome||gv(nome))return;
-    var c=PAL[S.vend.length%PAL.length];
-    S.vend.push({n:nome,c:c,p:nuovoPerc,perc:nuovoPct});S.sale[nome]=[];
+    var c=PAL[S.vend.length%PAL.length];S.vend.push({n:nome,c:c,p:np,perc:npc});S.sale[nome]=[];
     S.tab=nome;S.view="input";mw.innerHTML="";sv();render();
   });
-  mi.onkeydown=function(e){if(e.key==="Enter")mok.onclick();};
-  mbs.appendChild(mok);mb.appendChild(mbs);
-  ov.appendChild(mb);ov.onclick=function(e){if(e.target===ov)mw.innerHTML="";};
+  mi.onkeydown=function(e){if(e.key==="Enter")ok.onclick();};
+  btns.appendChild(ok);mb.appendChild(btns);ov.appendChild(mb);ov.onclick=function(e){if(e.target===ov)mw.innerHTML="";};
   mw.appendChild(ov);setTimeout(function(){mi.focus();},100);
 }
 
-function openEditVend(nome){
-  var vv=gv(nome);if(!vv)return;
+function openEdit(nome){
+  var vx=gv(nome);if(!vx)return;
   var mw=document.getElementById("mw");mw.innerHTML="";
-  var ov=mk("div","position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:50;display:flex;align-items:flex-end;justify-content:center;");
-  var mb=mk("div","background:#151515;border-radius:20px 20px 0 0;padding:24px;width:100%;max-width:480px;border:1px solid "+vv.c+"44;");
-  mb.appendChild(mk("div","font-size:14px;font-weight:700;margin-bottom:14px;","Modifica "+nome));
-  var ni=document.createElement("input");ni.type="text";ni.value=nome;
-  ni.style.cssText="width:100%;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:10px;padding:10px 14px;color:#f0f0f0;font-family:'Courier New',monospace;font-size:15px;outline:none;margin-bottom:16px;";
-  mb.appendChild(ni);
-  var mbs=mk("div","display:flex;gap:8px;");
-  mbs.appendChild(btn("Annulla","flex:1;background:#1e1e1e;color:#777;border:none;border-radius:10px;padding:11px;font-size:13px;",function(){mw.innerHTML="";}));
-  if(S.vend.length>1){
-    mbs.appendChild(btn("Elimina","flex:1;background:#c00;color:#fff;border:none;border-radius:10px;padding:11px;font-size:13px;",function(){
-      if(!confirm("Eliminare "+nome+"?"))return;
-      S.vend=S.vend.filter(function(x){return x.n!==nome;});delete S.sale[nome];S.tab=S.vend[0]?S.vend[0].n:"";mw.innerHTML="";sv();render();
-    }));
-  }
-  mbs.appendChild(btn("Salva","flex:2;background:#f0f0f0;color:#000;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:700;",function(){
-    var newNome=ni.value.trim();if(!newNome)return;
-    if(newNome!==nome){vv.n=newNome;S.sale[newNome]=S.sale[nome]||[];delete S.sale[nome];if(S.tab===nome)S.tab=newNome;}
+  var ov=mk("div","position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:50;display:flex;align-items:flex-end;justify-content:center;");
+  var mb=el("div","modal-box");mb.style.borderTopColor=vx.c+"44";mb.appendChild(el("div","modal-title","Modifica "+nome));
+  var ni=document.createElement("input");ni.type="text";ni.value=nome;ni.className="modal-inp";mb.appendChild(ni);
+  var btns=el("div","modal-btns");btns.appendChild(b("Annulla","modal-cancel",function(){mw.innerHTML="";}));
+  if(S.vend.length>1)btns.appendChild(b("Elimina","modal-del",function(){
+    if(!confirm("Eliminare "+nome+"?"))return;
+    S.vend=S.vend.filter(function(x){return x.n!==nome;});delete S.sale[nome];S.tab=S.vend[0]?S.vend[0].n:"";mw.innerHTML="";sv();render();
+  }));
+  btns.appendChild(b("Salva","modal-ok",function(){
+    var nn=ni.value.trim();if(!nn)return;
+    if(nn!==nome){vx.n=nn;S.sale[nn]=S.sale[nome]||[];delete S.sale[nome];if(S.tab===nome)S.tab=nn;}
     mw.innerHTML="";sv();render();
   }));
-  mb.appendChild(mbs);ov.appendChild(mb);
-  ov.onclick=function(e){if(e.target===ov)mw.innerHTML="";};
+  mb.appendChild(btns);ov.appendChild(mb);ov.onclick=function(e){if(e.target===ov)mw.innerHTML="";};
   mw.appendChild(ov);setTimeout(function(){ni.focus();ni.select();},100);
 }
 
 function esporta(){
-  var today=new Date().toLocaleDateString("it-IT"),tg=totG(),ts=totSpese(),out="";
-  for(var i=0;i<S.vend.length;i++){
-    var vv=S.vend[i],t=tot(vv.n),arr=S.sale[vv.n]||[];
-    out+=vv.n.toUpperCase()+"\n";
+  var today=new Date().toLocaleDateString("it-IT"),tg=totG(),ts=totSp(),out="";
+  S.vend.forEach(function(vx,i){
+    var t=tot(vx.n),arr=S.sale[vx.n]||[];out+=vx.n.toUpperCase()+"\n";
     if(!arr.length){out+="  nessuna vendita\n";}
-    else{for(var j=0;j<arr.length;j++){var s=arr[j];out+="  - "+dateStr(s.data)+" "+money(s.importo)+(s.nota?" ("+s.nota+")":"")+(vv.p?" ["+vv.perc+"% = "+money(s.importo*(vv.perc/100))+"]":"")+"\n";}}
-    out+="  TOTALE: "+money(t)+"\n";
-    if(vv.p&&t>0)out+="  Percentuale "+vv.perc+"%: "+money(pval(vv))+"\n  Netto: "+money(nval(vv))+"\n";
-    out+="\n";
-  }
-  if(S.spese.length){
-    out+="--------------------\nSPESE\n";
-    for(var i=0;i<S.spese.length;i++){var sp=S.spese[i];out+="  - "+sp.cat+": "+money(sp.importo)+(sp.nota?" ("+sp.nota+")":"")+"\n";}
-    out+="  TOTALE SPESE: "+money(ts)+"\n";
-  }
-  var html="<!DOCTYPE html><html><head><meta charset='utf-8'><title>Swap Meet</title><style>body{font-family:'Courier New',monospace;padding:30px;color:#111;max-width:600px;margin:0 auto}h1{font-size:22px;border-bottom:3px solid #111;padding-bottom:8px}pre{font-size:13px;line-height:1.9;white-space:pre-wrap;margin-top:16px}.tot{margin-top:10px;border-top:2px solid #111;padding-top:8px;font-size:16px;font-weight:bold}@media print{button{display:none}}</style></head><body><h1>Vendite Swap Meet</h1><p style='color:#666;font-size:12px'>Esportato il "+today+"</p><pre>"+out+"</pre><div class='tot'>TOTALE VENDITE: "+money(tg)+"</div>"+(ts>0?"<div class='tot' style='color:#888'>TOTALE SPESE: - "+money(ts)+"</div><div class='tot'>NETTO: "+money(tg-ts)+"</div>":"")+"<br><button onclick='window.print()' style='margin-top:12px;padding:10px 20px;font-size:14px'>Stampa / Salva PDF</button></body></html>";
-  var w=window.open("","_blank");if(!w){alert("Abilita popup nel browser");return;}
-  w.document.write(html);w.document.close();w.focus();
+    else arr.forEach(function(s){out+="  - "+ds(s.data)+" "+m(s.importo)+(s.nota?" ("+s.nota+")":"")+(vx.p?" ["+vx.perc+"% = "+m(s.importo*(vx.perc/100))+"]":"")+"\n";});
+    out+="  TOTALE: "+m(t)+"\n";
+    if(vx.p&&t>0)out+="  Percentuale "+vx.perc+"%: "+m(pv(vx))+"\n  Netto: "+m(nv(vx))+"\n";
+    if(i<S.vend.length-1)out+="\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\n";
+  });
+  if(S.spese.length){out+="\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nSPESE\n";S.spese.forEach(function(s){out+="  - "+s.cat+": "+m(s.importo)+(s.nota?" ("+s.nota+")":"")+"\n";});out+="  TOTALE: "+m(ts)+"\n";}
+  var html="<!DOCTYPE html><html><head><meta charset='utf-8'><title>Swap Meet</title><style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;padding:32px;color:#111;max-width:600px;margin:0 auto}h1{font-size:24px;font-weight:800;letter-spacing:-0.5px;border-bottom:2px solid #111;padding-bottom:10px}pre{font-size:13px;line-height:1.9;white-space:pre-wrap;margin-top:18px;font-family:'Courier New',monospace}.tot{margin-top:12px;border-top:2px solid #111;padding-top:10px;font-size:17px;font-weight:800}@media print{button{display:none}}</style></head><body><h1>Vendite Swap Meet</h1><p style='color:#888;font-size:13px;margin-top:6px'>Esportato il "+today+"</p><pre>"+out+"</pre><div class='tot'>TOTALE VENDITE: "+m(tg)+"</div>"+(ts>0?"<div class='tot' style='color:#888'>TOTALE SPESE: - "+m(ts)+"</div><div class='tot'>NETTO: "+m(tg-ts)+"</div>":"")+"<br><button onclick='window.print()' style='margin-top:14px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;border-radius:10px;border:2px solid #111;'>Stampa / Salva PDF</button></body></html>";
+  var w=window.open("","_blank");if(!w){alert("Abilita popup nel browser");return;}w.document.write(html);w.document.close();w.focus();
 }
-
 render();
 </script>
 </body>
