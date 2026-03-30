@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Swap Meet">
+<meta name="theme-color" content="#0a0a0a">
+<title>Vendite Swap Meet</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0a0a0a;color:#f0f0f0;font-family:'Courier New',monospace;}
+button,input,select{font-family:'Courier New',monospace;}
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
+::-webkit-scrollbar{display:none;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div id="mw"></div>
+<script>
+var PAL=["#e94560","#53d8fb","#f5a623","#a8ff78","#ee4540","#c792ea","#ff9f43","#26de81"];
+var SPESE_CAT=["Carburante","Cibo","Albergo","Pedaggi","Parcheggio","Altro"];
+var KEY="swp7";
+
+function defS(){
+  return{
+    vend:[
+      {n:"Matteo",c:"#e94560",p:false,perc:20},
+      {n:"James", c:"#53d8fb",p:false,perc:20},
+      {n:"Paride",c:"#f5a623",p:false,perc:20},
+      {n:"Simone",c:"#a8ff78",p:false,perc:20},
+      {n:"Nichil",c:"#ee4540",p:false,perc:20}
+    ],
+    sale:{Matteo:[],James:[],Paride:[],Simone:[],Nichil:[]},
+    spese:[],
+    tab:"Matteo",
+    view:"input"
+  };
+}
+
+var S;
+try{var r=localStorage.getItem(KEY);S=r?JSON.parse(r):defS();}catch(e){S=defS();}
+if(!S||!S.vend)S=defS();
+if(!S.spese)S.spese=[];
+S.vend.forEach(function(v){if(v.perc===undefined)v.perc=20;if(v.p===undefined)v.p=false;});
+
+function sv(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function money(n){return"\u20AC"+(+n).toFixed(2).replace(".",",");}
+function dateStr(d){try{return new Date(d).toLocaleDateString("it-IT",{day:"2-digit",month:"2-digit",year:"2-digit",hour:"2-digit",minute:"2-digit"});}catch(e){return"";}}
+function gv(n){for(var i=0;i<S.vend.length;i++)if(S.vend[i].n===n)return S.vend[i];return null;}
+function tot(n){var a=S.sale[n]||[];var s=0;for(var i=0;i<a.length;i++)s+=a[i].importo;return s;}
+function totG(){var s=0;for(var i=0;i<S.vend.length;i++)s+=tot(S.vend[i].n);return s;}
+function totSpese(){var s=0;for(var i=0;i<S.spese.length;i++)s+=S.spese[i].importo;return s;}
+function pval(v){return tot(v.n)*(v.perc/100);}
+function nval(v){return tot(v.n)-pval(v);}
+function mk(tag,css,txt){var e=document.createElement(tag);if(css)e.style.cssText=css;if(txt!==undefined)e.textContent=txt;return e;}
+function btn(txt,css,fn){var b=mk("button",css+"cursor:pointer;");b.textContent=txt;b.onclick=fn;return b;}
+
+function render(){
+  var root=document.getElementById("root");root.innerHTML="";
+  root.style.cssText="max-width:480px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;";
+  var v=gv(S.tab)||S.vend[0];var col=v?v.c:"#888";
+
+  var hdr=mk("div","background:#111;border-bottom:1px solid #1a1a1a;padding:12px 14px 10px;position:sticky;top:0;z-index:10;");
+  var tr=mk("div","display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;");
+  var tb=mk("div");
+  tb.appendChild(mk("div","font-size:9px;color:#444;letter-spacing:3px;","REGISTRO"));
+  tb.appendChild(mk("div","font-size:17px;font-weight:700;","\uD83C\uDFCD Vendite Swap Meet"));
+  tr.appendChild(tb);
+  var vb=mk("div","display:flex;gap:5px;");
+  ["input","riepilogo","spese"].forEach(function(vw){
+    var label=vw==="input"?"Input":vw==="riepilogo"?"Riepilogo":"Spese";
+    vb.appendChild(btn(label,"border:none;border-radius:8px;padding:6px 10px;font-size:10px;font-weight:700;background:"+(S.view===vw?"#f0f0f0":"#1a1a1a")+";color:"+(S.view===vw?"#000":"#555")+";",function(){S.view=vw;sv();render();}));
+  });
+  tr.appendChild(vb);hdr.appendChild(tr);
+
+  var tabs=mk("div","display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;");
+  for(var i=0;i<S.vend.length;i++){
+    (function(vv){
+      var active=S.tab===vv.n&&S.view==="input";
+      var b=btn(
+        vv.n+(vv.p?" "+vv.perc+"%":""),
+        "flex-shrink:0;border:none;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:700;background:"+(active?vv.c:"#1a1a1a")+";color:"+(active?"#000":"#666")+";",
+        function(){S.tab=vv.n;S.view="input";sv();render();}
+      );
+      var lt;
+      b.addEventListener("touchstart",function(){lt=setTimeout(function(){openEditVend(vv.n);},600);},{passive:true});
+      b.addEventListener("touchend",function(){clearTimeout(lt);},{passive:true});
+      b.addEventListener("contextmenu",function(e){e.preventDefault();openEditVend(vv.n);});
+      tabs.appendChild(b);
+    })(S.vend[i]);
+  }
+  tabs.appendChild(btn("+ nuovo","flex-shrink:0;background:#1a1a1a;color:#444;border:1px dashed #333;border-radius:20px;padding:8px 16px;font-size:13px;",openNewVend));
+  hdr.appendChild(tabs);root.appendChild(hdr);
+
+  var ct=mk("div","flex:1;padding:12px 14px;");
+  if(S.view==="input")renderInput(ct,v,col);
+  else if(S.view==="riepilogo")renderRiep(ct);
+  else renderSpese(ct);
+  root.appendChild(ct);
+}
+
+function renderInput(wrap,v,col){
+  var nome=v.n,ps=v.p,perc=v.perc,sales=S.sale[nome]||[],t=tot(nome);
+  var card=mk("div","background:#111;border-radius:16px;overflow:hidden;border:1px solid "+col+"33;margin-bottom:12px;");
+
+  var ch=mk("div","background:"+col+"18;border-bottom:1px solid "+col+"33;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;");
+  var cl=mk("div");
+  cl.appendChild(mk("div","font-size:17px;font-weight:700;",nome));
+  if(ps)cl.appendChild(mk("div","font-size:9px;color:"+col+";letter-spacing:1.5px;margin-top:2px;","PERC. "+perc+"% ATTIVA"));
+  var cr=mk("div","display:flex;flex-direction:column;align-items:flex-end;");
+  cr.appendChild(mk("div","font-size:22px;font-weight:700;color:"+col+";",money(t)));
+  if(ps&&t>0)cr.appendChild(mk("div","font-size:10px;color:#555;","netto "+money(nval(v))));
+  ch.appendChild(cl);ch.appendChild(cr);card.appendChild(ch);
+
+  var prow=mk("div","display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #161616;");
+  var tbg=mk("div","width:36px;height:20px;border-radius:10px;background:"+(ps?"#f5a623":"#2a2a2a")+";position:relative;flex-shrink:0;cursor:pointer;transition:background 0.2s;");
+  var tdt=mk("div","position:absolute;top:2px;left:"+(ps?"18px":"2px")+";width:16px;height:16px;border-radius:50%;background:#fff;transition:left 0.15s;");
+  tbg.appendChild(tdt);
+  tbg.onclick=function(){v.p=!v.p;sv();render();};
+  prow.appendChild(tbg);
+  prow.appendChild(mk("span","font-size:11px;color:#666;","Percentuale:"));
+  var pinp=document.createElement("input");
+  pinp.type="number";pinp.value=perc;pinp.min=0;pinp.max=100;
+  pinp.style.cssText="width:52px;background:#0a0a0a;border:1px solid #333;border-radius:6px;padding:3px 6px;color:#f0f0f0;font-family:'Courier New',monospace;font-size:12px;outline:none;text-align:center;";
+  pinp.onchange=function(){var val=parseFloat(pinp.value);if(!isNaN(val)&&val>=0&&val<=100){v.perc=val;sv();render();}};
+  prow.appendChild(pinp);
+  prow.appendChild(mk("span","font-size:11px;color:#666;","%"));
+  if(ps&&t>0)prow.appendChild(mk("span","font-size:11px;font-weight:700;color:"+col+";margin-left:auto;","\u2192 "+money(pval(v))));
+  card.appendChild(prow);
+
+  var ia=mk("div","padding:12px 14px;display:flex;flex-direction:column;gap:8px;");
+  var ir=mk("div","display:flex;gap:8px;");
+  var ainp=document.createElement("input");
+  ainp.type="number";ainp.inputMode="decimal";ainp.placeholder="\u20AC importo";
+  ainp.style.cssText="flex:1;min-width:0;background:#0a0a0a;border:1px solid "+col+"55;border-radius:10px;padding:10px 12px;color:#f0f0f0;font-family:'Courier New',monospace;font-size:16px;outline:none;";
+  var ninp=document.createElement("input");
+  ninp.type="text";ninp.placeholder="nota (opzionale)";
+  ninp.style.cssText="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:10px;padding:8px 12px;color:#888;font-family:'Courier New',monospace;font-size:12px;outline:none;width:100%;";
+  var ab=btn("+","background:"+col+";color:#000;border:none;border-radius:10px;padding:10px 20px;font-size:18px;font-weight:700;flex-shrink:0;",function(){
+    var val=parseFloat((ainp.value||"").replace(",","."));if(isNaN(val)||val<=0)return;
+    if(!S.sale[nome])S.sale[nome]=[];
+    S.sale[nome].push({importo:val,nota:ninp.value||"",id:Date.now(),data:new Date().toISOString()});
+    ainp.value="";ninp.value="";sv();render();
+  });
+  ainp.onkeydown=function(e){if(e.key==="Enter")ab.onclick();};
+  ir.appendChild(ainp);ir.appendChild(ab);ia.appendChild(ir);ia.appendChild(ninp);card.appendChild(ia);
+
+  var sl=mk("div","max-height:260px;overflow-y:auto;");
+  if(!sales.length){
+    sl.appendChild(mk("div","padding:20px;text-align:center;color:#222;font-size:12px;","nessuna vendita"));
+  } else {
+    var rev=sales.slice().reverse();
+    for(var i=0;i<rev.length;i++){
+      (function(s){
+        var si=mk("div","display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-top:1px solid #161616;");
+        var info=mk("div");
+        info.appendChild(mk("div","font-size:15px;font-weight:600;",money(s.importo)));
+        info.appendChild(mk("div","font-size:10px;color:#333;margin-top:1px;",dateStr(s.data)));
+        if(s.nota)info.appendChild(mk("div","font-size:10px;color:#444;margin-top:1px;",s.nota));
+        if(ps)info.appendChild(mk("div","font-size:10px;color:"+col+";margin-top:1px;","perc. "+money(s.importo*(perc/100))));
+        var rb=btn("\u2715","background:#1a1a1a;color:#444;border:none;border-radius:6px;padding:5px 11px;font-size:13px;",function(){
+          S.sale[nome]=S.sale[nome].filter(function(x){return x.id!==s.id;});sv();render();
+        });
+        si.appendChild(info);si.appendChild(rb);sl.appendChild(si);
+      })(rev[i]);
+    }
+  }
+  card.appendChild(sl);
+  if(S.vend.length>1){
+    card.appendChild(btn("rimuovi "+nome+" dal registro","width:100%;background:transparent;color:#2a2a2a;border:none;border-top:1px solid #161616;padding:10px;font-size:11px;",function(){
+      if(!confirm("Rimuovere "+nome+"?"))return;
+      S.vend=S.vend.filter(function(x){return x.n!==nome;});delete S.sale[nome];S.tab=S.vend[0]?S.vend[0].n:"";sv();render();
+    }));
+  }
+  wrap.appendChild(card);
+}
+
+function renderRiep(wrap){
+  var tg=totG();var ts=totSpese();
+  var stot=mk("div","background:#111;border-radius:16px;padding:14px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border:1px solid #1a1a1a;");
+  var tb=mk("div");
+  tb.appendChild(mk("div","font-size:9px;color:#444;letter-spacing:2px;","TOTALE GENERALE"));
+  tb.appendChild(mk("div","font-size:26px;font-weight:700;",money(tg)));
+  if(ts>0)tb.appendChild(mk("div","font-size:11px;color:#555;margin-top:2px;","netto spese: "+money(tg-ts)));
+  stot.appendChild(tb);
+  stot.appendChild(btn("\uD83D\uDCC4 PDF","background:#f0f0f0;color:#000;border:none;border-radius:10px;padding:9px 14px;font-size:11px;font-weight:700;",esporta));
+  wrap.appendChild(stot);
+
+  for(var i=0;i<S.vend.length;i++){
+    var vv=S.vend[i],t=tot(vv.n),n=(S.sale[vv.n]||[]).length;
+    var sc=mk("div","background:#111;border-radius:14px;padding:12px 14px;margin-bottom:8px;border:1px solid "+vv.c+"33;");
+    var sct=mk("div","display:flex;justify-content:space-between;align-items:flex-start;");
+    var sl=mk("div");sl.appendChild(mk("div","font-weight:700;font-size:14px;",vv.n));sl.appendChild(mk("div","font-size:10px;color:#444;margin-top:2px;",n+" vendita"+(n!==1?"e":"")));
+    var sr=mk("div","display:flex;flex-direction:column;align-items:flex-end;");
+    sr.appendChild(mk("div","font-size:17px;font-weight:700;color:"+vv.c+";",money(t)));
+    if(vv.p&&t>0){
+      sr.appendChild(mk("div","font-size:10px;color:#555;","netto "+money(nval(vv))));
+      sr.appendChild(mk("div","font-size:10px;font-weight:700;border-radius:4px;padding:1px 6px;color:"+vv.c+";background:"+vv.c+"20;margin-top:2px;",vv.perc+"% = "+money(pval(vv))));
+    }
+    sct.appendChild(sl);sct.appendChild(sr);sc.appendChild(sct);
+    var bw=mk("div","margin-top:10px;height:2px;background:#1a1a1a;border-radius:2px;");
+    var bf=mk("div","height:100%;border-radius:2px;background:"+vv.c+";width:"+(tg>0?(t/tg*100):0)+"%;");
+    bw.appendChild(bf);sc.appendChild(bw);wrap.appendChild(sc);
+  }
+
+  for(var i=0;i<S.vend.length;i++){
+    var vv=S.vend[i];if(!vv.p||tot(vv.n)<=0)continue;
+    var pb=mk("div","background:"+vv.c+"12;border:1px solid "+vv.c+"55;border-radius:14px;padding:14px 16px;margin-bottom:8px;");
+    pb.appendChild(mk("div","font-size:9px;letter-spacing:2px;color:"+vv.c+";margin-bottom:8px;","PERCENTUALE "+vv.n.toUpperCase()+" ("+vv.perc+"%)"));
+    [[" Vendite lorde",money(tot(vv.n))],["Percentuale ("+vv.perc+"%)","- "+money(pval(vv))]].forEach(function(row){
+      var r=mk("div","display:flex;justify-content:space-between;margin-bottom:4px;");
+      r.appendChild(mk("span","font-size:12px;color:#666;",row[0]));r.appendChild(mk("span","font-size:12px;",row[1]));pb.appendChild(r);
+    });
+    pb.appendChild(mk("div","height:1px;background:#222;margin:8px 0;"));
+    var ptr=mk("div","display:flex;justify-content:space-between;");
+    ptr.appendChild(mk("span","font-size:13px;font-weight:700;","Netto "+vv.n));ptr.appendChild(mk("span","font-size:13px;font-weight:700;",money(nval(vv))));pb.appendChild(ptr);
+    wrap.appendChild(pb);
+  }
+
+  if(ts>0){
+    var sb=mk("div","background:#ff9f4318;border:1px solid #ff9f4355;border-radius:14px;padding:14px 16px;margin-bottom:8px;");
+    sb.appendChild(mk("div","font-size:9px;letter-spacing:2px;color:#ff9f43;margin-bottom:8px;","TOTALE SPESE"));
+    var cats={};S.spese.forEach(function(s){cats[s.cat]=(cats[s.cat]||0)+s.importo;});
+    Object.keys(cats).forEach(function(cat){
+      var r=mk("div","display:flex;justify-content:space-between;margin-bottom:4px;");
+      r.appendChild(mk("span","font-size:12px;color:#666;",cat));r.appendChild(mk("span","font-size:12px;",money(cats[cat])));sb.appendChild(r);
+    });
+    sb.appendChild(mk("div","height:1px;background:#222;margin:8px 0;"));
+    var pr=mk("div","display:flex;justify-content:space-between;");
+    pr.appendChild(mk("span","font-size:13px;font-weight:700;","Totale spese"));pr.appendChild(mk("span","font-size:13px;font-weight:700;color:#ff9f43;",money(ts)));sb.appendChild(pr);
+    wrap.appendChild(sb);
+  }
+}
+
+function renderSpese(wrap){
+  var ts=totSpese();
+  var head=mk("div","background:#111;border-radius:16px;padding:14px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border:1px solid #ff9f4333;");
+  var tb=mk("div");tb.appendChild(mk("div","font-size:9px;color:#ff9f43;letter-spacing:2px;","TOTALE SPESE"));tb.appendChild(mk("div","font-size:26px;font-weight:700;",money(ts)));
+  head.appendChild(tb);wrap.appendChild(head);
+
+  var form=mk("div","background:#111;border-radius:16px;padding:14px;margin-bottom:10px;border:1px solid #1a1a1a;");
+  form.appendChild(mk("div","font-size:10px;color:#555;margin-bottom:10px;letter-spacing:1px;","NUOVA SPESA"));
+  var row1=mk("div","display:flex;gap:8px;margin-bottom:8px;");
+  var si=document.createElement("input");si.type="number";si.inputMode="decimal";si.placeholder="\u20AC importo";
+  si.style.cssText="flex:1;min-width:0;background:#0a0a0a;border:1px solid #ff9f4355;border-radius:10px;padding:10px 12px;color:#f0f0f0;font-family:'Courier New',monospace;font-size:16px;outline:none;";
+  var sel=document.createElement("select");
+  sel.style.cssText="background:#0a0a0a;border:1px solid #333;border-radius:10px;padding:10px 8px;color:#f0f0f0;font-family:'Courier New',monospace;font-size:12px;outline:none;flex-shrink:0;";
+  SPESE_CAT.forEach(function(c){var o=document.createElement("option");o.value=c;o.textContent=c;sel.appendChild(o);});
+  row1.appendChild(si);row1.appendChild(sel);form.appendChild(row1);
+  var sn=document.createElement("input");sn.type="text";sn.placeholder="nota (opzionale)";
+  sn.style.cssText="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:10px;padding:8px 12px;color:#888;font-family:'Courier New',monospace;font-size:12px;outline:none;width:100%;margin-bottom:8px;";
+  form.appendChild(sn);
+  var sab=btn("+ Aggiungi spesa","width:100%;background:#ff9f43;color:#000;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:700;",function(){
+    var val=parseFloat((si.value||"").replace(",","."));if(isNaN(val)||val<=0)return;
+    S.spese.push({importo:val,cat:sel.value,nota:sn.value||"",id:Date.now(),data:new Date().toISOString()});
+    si.value="";sn.value="";sv();render();
+  });
+  si.onkeydown=function(e){if(e.key==="Enter")sab.onclick();};
+  form.appendChild(sab);wrap.appendChild(form);
+
+  if(!S.spese.length){
+    wrap.appendChild(mk("div","background:#111;border-radius:14px;padding:20px;text-align:center;color:#222;font-size:12px;border:1px solid #1a1a1a;","nessuna spesa registrata"));
+    return;
+  }
+  var list=mk("div","background:#111;border-radius:14px;overflow:hidden;border:1px solid #1a1a1a;");
+  var rev=S.spese.slice().reverse();
+  for(var i=0;i<rev.length;i++){
+    (function(s,idx){
+      var si2=mk("div","display:flex;justify-content:space-between;align-items:center;padding:10px 14px;"+(idx>0?"border-top:1px solid #161616;":""));
+      var info=mk("div");
+      var firstRow=mk("div","display:flex;align-items:center;gap:6px;");
+      firstRow.appendChild(mk("span","font-size:10px;font-weight:700;color:#ff9f43;background:#ff9f4320;border-radius:4px;padding:1px 6px;",s.cat));
+      firstRow.appendChild(mk("span","font-size:15px;font-weight:600;",money(s.importo)));
+      info.appendChild(firstRow);
+      info.appendChild(mk("div","font-size:10px;color:#333;margin-top:1px;",dateStr(s.data)));
+      if(s.nota)info.appendChild(mk("div","font-size:10px;color:#444;margin-top:1px;",s.nota));
+      var rb=btn("\u2715","background:#1a1a1a;color:#444;border:none;border-radius:6px;padding:5px 11px;font-size:13px;",function(){
+        S.spese=S.spese.filter(function(x){return x.id!==s.id;});sv();render();
+      });
+      si2.appendChild(info);si2.appendChild(rb);list.appendChild(si2);
+    })(rev[i],i);
+  }
+  wrap.appendChild(list);
+}
+
+function openNewVend(){
+  var mw=document.getElementById("mw");mw.innerHTML="";
+  var nuovoPerc=false;var nuovoPct=20;
+  var ov=mk("div","position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:50;display:flex;align-items:flex-end;justify-content:center;");
+  var mb=mk("div","background:#151515;border-radius:20px 20px 0 0;padding:24px;width:100%;max-width:480px;border:1px solid #2a2a2a;");
+  mb.appendChild(mk("div","font-size:14px;font-weight:700;margin-bottom:14px;","Nuovo venditore"));
+  var mi=document.createElement("input");mi.type="text";mi.placeholder="Nome";
+  mi.style.cssText="width:100%;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:10px;padding:10px 14px;color:#f0f0f0;font-family:'Courier New',monospace;font-size:15px;outline:none;margin-bottom:12px;";
+  mb.appendChild(mi);
+  var trow=mk("div","display:flex;align-items:center;gap:10px;margin-bottom:12px;cursor:pointer;");
+  var tbg=mk("div","width:36px;height:20px;border-radius:10px;background:#2a2a2a;position:relative;flex-shrink:0;");
+  var tdt=mk("div","position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left 0.15s;");
+  tbg.appendChild(tdt);trow.appendChild(tbg);trow.appendChild(mk("span","font-size:12px;color:#777;","Percentuale attiva"));
+  trow.onclick=function(){nuovoPerc=!nuovoPerc;tbg.style.background=nuovoPerc?"#f5a623":"#2a2a2a";tdt.style.left=nuovoPerc?"18px":"2px";};
+  mb.appendChild(trow);
+  var pr=mk("div","display:flex;align-items:center;gap:8px;margin-bottom:16px;");
+  pr.appendChild(mk("span","font-size:12px;color:#777;","Percentuale:"));
+  var pi=document.createElement("input");pi.type="number";pi.value=20;pi.min=0;pi.max=100;
+  pi.style.cssText="width:60px;background:#0d0d0d;border:1px solid #333;border-radius:8px;padding:6px 10px;color:#f0f0f0;font-family:'Courier New',monospace;font-size:14px;outline:none;text-align:center;";
+  pi.onchange=function(){nuovoPct=parseFloat(pi.value)||20;};
+  pr.appendChild(pi);pr.appendChild(mk("span","font-size:12px;color:#777;","%"));mb.appendChild(pr);
+  var mbs=mk("div","display:flex;gap:8px;");
+  mbs.appendChild(btn("Annulla","flex:1;background:#1e1e1e;color:#777;border:none;border-radius:10px;padding:11px;font-size:13px;",function(){mw.innerHTML="";}));
+  var mok=btn("Aggiungi","flex:2;background:#f0f0f0;color:#000;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:700;",function(){
+    var nome=mi.value.trim();if(!nome||gv(nome))return;
+    var c=PAL[S.vend.length%PAL.length];
+    S.vend.push({n:nome,c:c,p:nuovoPerc,perc:nuovoPct});S.sale[nome]=[];
+    S.tab=nome;S.view="input";mw.innerHTML="";sv();render();
+  });
+  mi.onkeydown=function(e){if(e.key==="Enter")mok.onclick();};
+  mbs.appendChild(mok);mb.appendChild(mbs);
+  ov.appendChild(mb);ov.onclick=function(e){if(e.target===ov)mw.innerHTML="";};
+  mw.appendChild(ov);setTimeout(function(){mi.focus();},100);
+}
+
+function openEditVend(nome){
+  var vv=gv(nome);if(!vv)return;
+  var mw=document.getElementById("mw");mw.innerHTML="";
+  var ov=mk("div","position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:50;display:flex;align-items:flex-end;justify-content:center;");
+  var mb=mk("div","background:#151515;border-radius:20px 20px 0 0;padding:24px;width:100%;max-width:480px;border:1px solid "+vv.c+"44;");
+  mb.appendChild(mk("div","font-size:14px;font-weight:700;margin-bottom:14px;","Modifica "+nome));
+  var ni=document.createElement("input");ni.type="text";ni.value=nome;
+  ni.style.cssText="width:100%;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:10px;padding:10px 14px;color:#f0f0f0;font-family:'Courier New',monospace;font-size:15px;outline:none;margin-bottom:16px;";
+  mb.appendChild(ni);
+  var mbs=mk("div","display:flex;gap:8px;");
+  mbs.appendChild(btn("Annulla","flex:1;background:#1e1e1e;color:#777;border:none;border-radius:10px;padding:11px;font-size:13px;",function(){mw.innerHTML="";}));
+  if(S.vend.length>1){
+    mbs.appendChild(btn("Elimina","flex:1;background:#c00;color:#fff;border:none;border-radius:10px;padding:11px;font-size:13px;",function(){
+      if(!confirm("Eliminare "+nome+"?"))return;
+      S.vend=S.vend.filter(function(x){return x.n!==nome;});delete S.sale[nome];S.tab=S.vend[0]?S.vend[0].n:"";mw.innerHTML="";sv();render();
+    }));
+  }
+  mbs.appendChild(btn("Salva","flex:2;background:#f0f0f0;color:#000;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:700;",function(){
+    var newNome=ni.value.trim();if(!newNome)return;
+    if(newNome!==nome){vv.n=newNome;S.sale[newNome]=S.sale[nome]||[];delete S.sale[nome];if(S.tab===nome)S.tab=newNome;}
+    mw.innerHTML="";sv();render();
+  }));
+  mb.appendChild(mbs);ov.appendChild(mb);
+  ov.onclick=function(e){if(e.target===ov)mw.innerHTML="";};
+  mw.appendChild(ov);setTimeout(function(){ni.focus();ni.select();},100);
+}
+
+function esporta(){
+  var today=new Date().toLocaleDateString("it-IT"),tg=totG(),ts=totSpese(),out="";
+  for(var i=0;i<S.vend.length;i++){
+    var vv=S.vend[i],t=tot(vv.n),arr=S.sale[vv.n]||[];
+    out+=vv.n.toUpperCase()+"\n";
+    if(!arr.length){out+="  nessuna vendita\n";}
+    else{for(var j=0;j<arr.length;j++){var s=arr[j];out+="  - "+dateStr(s.data)+" "+money(s.importo)+(s.nota?" ("+s.nota+")":"")+(vv.p?" ["+vv.perc+"% = "+money(s.importo*(vv.perc/100))+"]":"")+"\n";}}
+    out+="  TOTALE: "+money(t)+"\n";
+    if(vv.p&&t>0)out+="  Percentuale "+vv.perc+"%: "+money(pval(vv))+"\n  Netto: "+money(nval(vv))+"\n";
+    out+="\n";
+  }
+  if(S.spese.length){
+    out+="--------------------\nSPESE\n";
+    for(var i=0;i<S.spese.length;i++){var sp=S.spese[i];out+="  - "+sp.cat+": "+money(sp.importo)+(sp.nota?" ("+sp.nota+")":"")+"\n";}
+    out+="  TOTALE SPESE: "+money(ts)+"\n";
+  }
+  var html="<!DOCTYPE html><html><head><meta charset='utf-8'><title>Swap Meet</title><style>body{font-family:'Courier New',monospace;padding:30px;color:#111;max-width:600px;margin:0 auto}h1{font-size:22px;border-bottom:3px solid #111;padding-bottom:8px}pre{font-size:13px;line-height:1.9;white-space:pre-wrap;margin-top:16px}.tot{margin-top:10px;border-top:2px solid #111;padding-top:8px;font-size:16px;font-weight:bold}@media print{button{display:none}}</style></head><body><h1>Vendite Swap Meet</h1><p style='color:#666;font-size:12px'>Esportato il "+today+"</p><pre>"+out+"</pre><div class='tot'>TOTALE VENDITE: "+money(tg)+"</div>"+(ts>0?"<div class='tot' style='color:#888'>TOTALE SPESE: - "+money(ts)+"</div><div class='tot'>NETTO: "+money(tg-ts)+"</div>":"")+"<br><button onclick='window.print()' style='margin-top:12px;padding:10px 20px;font-size:14px'>Stampa / Salva PDF</button></body></html>";
+  var w=window.open("","_blank");if(!w){alert("Abilita popup nel browser");return;}
+  w.document.write(html);w.document.close();w.focus();
+}
+
+render();
+</script>
+</body>
+</html>
