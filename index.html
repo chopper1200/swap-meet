@@ -32,9 +32,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 .new-tab{flex-shrink:0;border:1px dashed #1e1e1e;border-radius:20px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;background:transparent;color:#333;}
 .refresh-btn{border:1px solid #1e1e1e;border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;cursor:pointer;background:transparent;color:#444;}
 .ct{flex:1;padding:14px 16px;}
-.diag-box{background:#111;border:1px solid #1e1e1e;border-radius:14px;padding:14px;margin-bottom:12px;font-size:11px;color:#555;line-height:1.7;}
-.diag-box.err{border-color:#ff444433;color:#ff6666;}
-.diag-box.ok{border-color:#00ff8833;color:#00ff8899;}
+.diag-box{background:#111;border:1px solid #ff444433;border-radius:14px;padding:14px;margin-bottom:12px;font-size:11px;color:#ff6666;line-height:1.7;}
 .diag-title{font-size:9px;letter-spacing:2px;font-weight:700;margin-bottom:8px;}
 .hero{background:#111;border-radius:20px;padding:18px;margin-bottom:12px;border:1px solid #1a1a1a;}
 .hero-label{font-size:9px;color:#444;letter-spacing:3px;font-weight:700;margin-bottom:5px;}
@@ -149,9 +147,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 <div id="mw"></div>
 <div class="toast" id="toast"></div>
 <script>
-var BIN_ID="69ca4ef2aaba882197a88718";
-var API_KEY="$2a$10$YC6UzgNNdE/KLjHwTuUT9O86aPLVMMO1JFfytjE4MUkzVG8QXEQuq";
-var BASE="https://api.jsonbin.io/v3/b/"+BIN_ID;
+var WORKER = "https://wild-sunset-677a.matb4.workers.dev";
 var PAL=["#00ff88","#53d8fb","#f5a623","#a8ff78","#ee4540","#c792ea","#ff9f43","#26de81"];
 var SCAT=["Carburante","Cibo","Albergo","Pedaggi","Parcheggio","Altro"];
 var syncStatus="loading";
@@ -160,10 +156,8 @@ var saving=false;
 var toastTimer=null;
 
 function showToast(msg,type){
-  var t=document.getElementById("toast");
-  if(!t)return;
-  clearTimeout(toastTimer);
-  t.textContent=msg;t.className="toast show "+(type||"");
+  var t=document.getElementById("toast");if(!t)return;
+  clearTimeout(toastTimer);t.textContent=msg;t.className="toast show "+(type||"");
   toastTimer=setTimeout(function(){t.className="toast";},3000);
 }
 
@@ -186,59 +180,40 @@ function fixS(){
 
 function loadRemote(cb){
   syncStatus="loading";syncMsg="Caricamento...";updatePill();
-  fetch(BASE+"/latest",{
-    method:"GET",
-    headers:{"X-Master-Key":API_KEY,"X-Bin-Meta":false}
-  })
-  .then(function(r){
-    if(!r.ok)throw new Error("HTTP "+r.status);
-    return r.json();
-  })
-  .then(function(data){
-    if(data&&data.record){
-      S=data.record;fixS();saveLocal();
+  fetch(WORKER,{method:"GET"})
+    .then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();})
+    .then(function(data){
+      if(data&&data.record){S=data.record;fixS();saveLocal();}
+      else if(data&&data.vend){S=data;fixS();saveLocal();}
       syncStatus="ok";syncMsg="Sincronizzato";
       showToast("✓ Dati aggiornati","ok");
-    } else {
-      syncStatus="ok";syncMsg="Nessun dato nel cloud";
-    }
-    updatePill();if(cb)cb();
-  })
-  .catch(function(err){
-    syncStatus="err";
-    syncMsg="Errore: "+err.message;
-    showToast("⚠ "+err.message,"err");
-    updatePill();if(cb)cb();
-  });
+      updatePill();if(cb)cb();
+    })
+    .catch(function(err){
+      syncStatus="err";syncMsg="Errore: "+err.message;
+      showToast("⚠ "+err.message,"err");
+      updatePill();if(cb)cb();
+    });
 }
 
 function saveRemote(){
   if(saving)return;
   saving=true;syncStatus="loading";syncMsg="Salvataggio...";updatePill();
-  fetch(BASE,{
-    method:"PUT",
-    headers:{"X-Master-Key":API_KEY,"Content-Type":"application/json"},
-    body:JSON.stringify(S)
-  })
-  .then(function(r){
-    if(!r.ok)throw new Error("HTTP "+r.status);
-    return r.json();
-  })
-  .then(function(){
-    syncStatus="ok";syncMsg="Sincronizzato";saving=false;
-    showToast("✓ Salvato","ok");updatePill();
-  })
-  .catch(function(err){
-    syncStatus="err";syncMsg="Errore salvataggio: "+err.message;
-    saving=false;showToast("⚠ Salvataggio fallito: "+err.message,"err");updatePill();
-  });
+  fetch(WORKER,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(S)})
+    .then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();})
+    .then(function(){
+      syncStatus="ok";syncMsg="Sincronizzato";saving=false;
+      showToast("✓ Salvato","ok");updatePill();
+    })
+    .catch(function(err){
+      syncStatus="err";syncMsg="Errore: "+err.message;
+      saving=false;showToast("⚠ "+err.message,"err");updatePill();
+    });
 }
 
 function sv(){saveLocal();saveRemote();}
-
 function updatePill(){
-  var p=document.getElementById("syncpill");
-  if(!p)return;
+  var p=document.getElementById("syncpill");if(!p)return;
   p.textContent=syncStatus==="ok"?"● LIVE":syncStatus==="loading"?"● SYNC...":"● OFFLINE";
   p.className="sync-pill "+(syncStatus==="ok"?"ok":syncStatus==="loading"?"loading":"err");
 }
@@ -276,8 +251,7 @@ function render(){
     vb.appendChild(b(x.l,"vnav-btn "+(S.view===x.k?"on":"off"),function(k){return function(){S.view=k;render();};}(x.k)));
   });
   rbox.appendChild(vb);
-  var rfbtn=b("\u21BB Aggiorna","refresh-btn",function(){loadRemote(render);});
-  rbox.appendChild(rfbtn);
+  rbox.appendChild(b("\u21BB Aggiorna","refresh-btn",function(){loadRemote(render);}));
   lr.appendChild(rbox);hdr.appendChild(lr);
   var tabs=el("div","tabs-wrap");
   S.vend.forEach(function(vx){
@@ -294,11 +268,11 @@ function render(){
   hdr.appendChild(tabs);root.appendChild(hdr);
   var ct=el("div","ct");
   if(syncStatus==="err"){
-    var eb=el("div","diag-box err");
+    var eb=el("div","diag-box");
     eb.appendChild(el("div","diag-title","⚠ PROBLEMA CONNESSIONE"));
-    var msg=mk("div","",syncMsg);eb.appendChild(msg);
-    var rbtn=b("Riprova ora","mag-add-btn",function(){loadRemote(render);});
-    rbtn.style.marginTop="10px";rbtn.style.background="#ff4444";eb.appendChild(rbtn);
+    eb.appendChild(mk("div","margin-bottom:8px;",syncMsg));
+    var rbtn=b("Riprova","mag-add-btn",function(){loadRemote(render);});
+    rbtn.style.background="#ff4444";eb.appendChild(rbtn);
     ct.appendChild(eb);
   }
   if(S.view==="input")renderInput(ct,vv,col);
@@ -562,10 +536,10 @@ function esporta(){
     });
     out+="  TOTALE: "+m(t)+"\n";
     if(vx.p&&t>0)out+="  Percentuale "+vx.perc+"%: "+m(pv(vx))+"\n  Netto: "+m(nv(vx))+"\n";
-    if(i<S.vend.length-1)out+="\n────────────────────\n\n";
+    if(i<S.vend.length-1)out+="\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\n";
   });
-  if(S.spese.length){out+="\n────────────────────\nSPESE\n";S.spese.forEach(function(s){out+="  - "+s.cat+": "+m(s.importo)+(s.nota?" ("+s.nota+")":"")+"\n";});out+="  TOTALE: "+m(ts)+"\n";}
-  if(S.magazzino.length){out+="\n────────────────────\nMAGAZZINO\n";S.magazzino.forEach(function(i){out+="  - "+i.nome+": "+i.qty+" pz"+(i.prezzoV?" · vend. "+m(i.prezzoV):"")+"\n";});}
+  if(S.spese.length){out+="\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nSPESE\n";S.spese.forEach(function(s){out+="  - "+s.cat+": "+m(s.importo)+(s.nota?" ("+s.nota+")":"")+"\n";});out+="  TOTALE: "+m(ts)+"\n";}
+  if(S.magazzino.length){out+="\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nMAGAZZINO\n";S.magazzino.forEach(function(i){out+="  - "+i.nome+": "+i.qty+" pz"+(i.prezzoV?" · vend. "+m(i.prezzoV):"")+"\n";});}
   var html="<!DOCTYPE html><html><head><meta charset='utf-8'><title>Swap Meet</title><style>body{font-family:-apple-system,sans-serif;padding:32px;color:#111;max-width:600px;margin:0 auto}h1{font-size:24px;font-weight:800;border-bottom:2px solid #111;padding-bottom:10px}pre{font-size:13px;line-height:1.9;white-space:pre-wrap;margin-top:18px;font-family:'Courier New',monospace}.tot{margin-top:12px;border-top:2px solid #111;padding-top:10px;font-size:17px;font-weight:800}@media print{button{display:none}}</style></head><body><h1>Vendite Swap Meet</h1><p style='color:#888;font-size:13px;margin-top:6px'>Esportato il "+today+"</p><pre>"+out+"</pre><div class='tot'>TOTALE VENDITE: "+m(tg)+"</div>"+(ts>0?"<div class='tot' style='color:#888'>TOTALE SPESE: - "+m(ts)+"</div><div class='tot'>NETTO: "+m(tg-ts)+"</div>":"")+"<br><button onclick='window.print()' style='margin-top:14px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;border-radius:10px;border:2px solid #111;'>Stampa / Salva PDF</button></body></html>";
   var w=window.open("","_blank");if(!w){alert("Abilita popup");return;}w.document.write(html);w.document.close();w.focus();
 }
